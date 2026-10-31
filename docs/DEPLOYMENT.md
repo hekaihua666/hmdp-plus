@@ -41,7 +41,7 @@ bash deploy/cloud/verify.sh
 
 `reindex.sh` 会替换 `hmdp_shop`，应在商户写入与增量同步暂停时执行，不能作为每次启动步骤。重复启动只需 `docker compose ... up -d`。
 
-Windows 本地完整部署：准备好 IK 和环境文件后用 `start-all.bat` 启动，首次初始化使用 `pwsh -File deploy/init.ps1`。本地 IDEA 模式见 [本地开发](LOCAL_DEVELOPMENT.md)。
+Windows 本地完整部署：准备好 IK 和环境文件后用 `start-all.bat` 启动，首次初始化使用 `powershell -ExecutionPolicy Bypass -File deploy/init.ps1`。本地 IDEA 模式见 [本地开发](LOCAL_DEVELOPMENT.md)。
 
 ## 数据与账号
 

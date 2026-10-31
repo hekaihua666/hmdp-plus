@@ -55,3 +55,7 @@ python3 loadgen.py --path "/voucher-order/seckill/$TEST_VOUCHER_ID" --method POS
   只有开这个才分得清"真的成功"和"被拒了"
 - `--out path.json`：结果写文件，方便 `summary.py` 汇总
 - `--label name`：场景名，汇总时按去掉末尾 `-c<并发>` 的部分分组
+
+## 创建独立秒杀测试数据
+
+专用测试环境可执行 `python3 prepare-fixture.py --apply`，创建一张不关联现有门店的测试券（库存20）和50名新用户。脚本输出券ID与私有令牌文件位置；使用该文件进行一次性请求，之后核对申请终态、订单数与两边库存。不会重置旧券。此小批次用于正确性验收，不作为持续吞吐结果。
