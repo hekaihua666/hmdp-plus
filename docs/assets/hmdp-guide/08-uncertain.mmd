@@ -1,0 +1,9 @@
+flowchart TB
+ A["事务提交 UNKNOWN"] --> B["调用 Redis 预占"]
+ B --> C{"取得明确结果？"}
+ C -->|成功| D["READY 与 HELD"]
+ C -->|网络超时| E["保留 INIT 与 UNKNOWN"]
+ E --> F["同一 orderId 恢复核查"]
+ F --> G{"凭据是否充分？"}
+ G -->|可确认| H["继续推进或补偿"]
+ G -->|凭据缺失| I["保留状态，等待核查"]

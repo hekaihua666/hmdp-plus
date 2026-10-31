@@ -1,0 +1,16 @@
+sequenceDiagram
+ participant B as 浏览器
+ participant N as Nginx
+ participant J as Java 上传接口
+ participant F as 共享静态目录
+ B->>N: POST 上传 FormData
+ N->>J: 转发到 /upload/blog
+ J->>F: UUID 命名与两级目录落盘
+ F-->>J: 文件保存完成
+ J-->>N: 返回 /blogs/目录/文件名
+ N-->>B: 返回上传结果
+ B->>B: 路径前补 /imgs，保存笔记地址
+ B->>N: GET /imgs/blogs/目录/文件名
+ N->>F: 读取同一个文件
+ F-->>N: 图片内容
+ N-->>B: 静态图片响应

@@ -1,0 +1,7 @@
+flowchart TB
+ A["HTTP 请求：券与登录校验"] --> B["check：只读检查时间、库存和用户归属"]
+ B -->|返回 0| C["生成 orderId，提交 INIT 申请"]
+ C --> D["后台 T1：提交 UNKNOWN 意图"]
+ D --> E["后台 T2：重查申请状态"]
+ E --> F["reserve：按 orderId 幂等预占"]
+ F -->|确认成功| G["记录 READY 与 HELD"]

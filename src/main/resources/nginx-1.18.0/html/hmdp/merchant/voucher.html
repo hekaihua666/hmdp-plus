@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>发布优惠券 · 黑马点评商户工作台</title>
+  <link rel="stylesheet" href="../css/element.css">
+  <link rel="stylesheet" href="./merchant.css">
+</head>
+<body>
+<div id="app" v-cloak class="workspace" v-loading="loading">
+  <aside class="sidebar"><div class="brand-mark">点评<span>商户工作台</span></div>
+    <div class="nav-label">店铺管理</div>
+    <a href="./index.html" class="nav-item"><i class="el-icon-house"></i> 我的店铺</a>
+    <div class="nav-label">营销工具</div>
+    <div class="nav-item active"><i class="el-icon-ticket"></i> 发布优惠券</div>
+    <div class="sidebar-footer"><span class="status-dot"></span> 专属店铺管理空间</div>
+  </aside>
+  <div class="workspace-main">
+    <header class="topbar"><span>商户工作台 <span class="breadcrumb">/ 发布优惠券</span></span>
+      <div class="account"><span>{{merchant.name || merchant.username}}</span><el-button type="text" @click="logout">退出登录</el-button></div>
+    </header>
+    <main class="page-content">
+      <div class="page-heading"><div><div class="eyebrow">营销工具</div><h1>发布优惠券</h1><p class="muted">为你的店铺发布代金券，吸引顾客到店。</p></div>
+        <a v-if="shop" :href="'/shop-detail.html?id='+shop.id" target="_blank" rel="noopener" class="preview-link">查看顾客页面 <i class="el-icon-top-right"></i></a>
+      </div>
+      <el-alert v-if="pageError" :title="pageError" type="error" :closable="false" show-icon class="page-alert"></el-alert>
+      <template v-if="shop">
+        <section class="edit-card">
+          <div class="card-heading"><h2>优惠券信息</h2><span class="muted">将发布到「{{shop.name}}」</span></div>
+          <el-form ref="form" :model="form" :rules="rules" label-position="top" @submit.native.prevent="submit">
+            <div class="form-grid">
+              <el-form-item label="优惠券标题" prop="title" class="full-width"><el-input v-model.trim="form.title" maxlength="255" placeholder="例如：满100减20"></el-input></el-form-item>
+              <el-form-item label="副标题"><el-input v-model.trim="form.subTitle" maxlength="255" placeholder="例如：全场通用"></el-input></el-form-item>
+              <el-form-item label="使用规则"><el-input v-model.trim="form.rules" maxlength="1024" placeholder="例如：仅限堂食，每桌限用一张"></el-input></el-form-item>
+              <el-form-item label="支付金额（元）" prop="payValue"><el-input-number v-model="form.payValue" :min="0" :max="1000000" :precision="0" controls-position="right"></el-input-number></el-form-item>
+              <el-form-item label="抵扣金额（元）" prop="actualValue"><el-input-number v-model="form.actualValue" :min="1" :max="1000000" :precision="0" controls-position="right"></el-input-number></el-form-item>
+              <el-form-item label="优惠券类型" prop="type"><el-radio-group v-model="form.type"><el-radio :label="0">普通券</el-radio><el-radio :label="1">秒杀券</el-radio></el-radio-group></el-form-item>
+            </div>
+            <div class="form-grid" v-if="form.type === 1">
+              <el-form-item label="库存" prop="stock"><el-input-number v-model="form.stock" :min="1" :max="1000000" :precision="0" controls-position="right"></el-input-number></el-form-item>
+              <el-form-item label="生效时间" prop="beginTime"><el-date-picker v-model="form.beginTime" type="datetime" placeholder="选择开始时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker></el-form-item>
+              <el-form-item label="失效时间" prop="endTime"><el-date-picker v-model="form.endTime" type="datetime" placeholder="选择结束时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker></el-form-item>
+            </div>
+            <div class="form-actions"><div><el-button @click="reset">清空</el-button><el-button type="primary" native-type="submit" :loading="submitting">发布优惠券</el-button></div></div>
+          </el-form>
+        </section>
+      </template>
+    </main>
+  </div>
+</div>
+<script src="../js/vue.js"></script><script src="../js/axios.min.js"></script><script src="../js/element.js"></script><script src="./voucher.js"></script>
+</body></html>

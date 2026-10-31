@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="HMDP - 本地开发 (IDEA)" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.hmdp.HmDianPingApplication" />
+    <module name="hmdp" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=local --spring.config.additional-location=optional:file:./config/" />
+    <method v="2"><option name="Make" enabled="true" /></method>
+  </configuration>
+</component>

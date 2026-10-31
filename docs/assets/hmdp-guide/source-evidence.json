@@ -1,0 +1,128 @@
+[
+  {
+    "name": "login-refresh",
+    "file": "src/main/java/com/hmdp/interceptor/RefreshTokenInterceptor.java",
+    "first_line": 51,
+    "last_line": 56,
+    "sha256": "0529240ddd48e59c1890fd730fd85c8c0447b1db255ec9c11886cefb2c389c08"
+  },
+  {
+    "name": "cache-pass-through",
+    "file": "src/main/java/com/hmdp/utils/CacheClient.java",
+    "first_line": 65,
+    "last_line": 87,
+    "sha256": "fa15d4ce46b249bfd57fbb5fea7154cb63199820ce9c6ae75f81ae48fdcda368"
+  },
+  {
+    "name": "id-generate",
+    "file": "src/main/java/com/hmdp/utils/RedisIdWorker.java",
+    "first_line": 38,
+    "last_line": 51,
+    "sha256": "b026f38e3cac8ce40bcb6f35e19758bc6eb0b4b7913562b8d7bec451c44c2bfe"
+  },
+  {
+    "name": "lua-reserve-tail",
+    "file": "src/main/resources/seckill-reserve.lua",
+    "first_line": 46,
+    "last_line": 49,
+    "sha256": "50f412f445f6db935b30e74379385ae7ca2f0108908079523100e4826f82a2d0"
+  },
+  {
+    "name": "order-claim",
+    "file": "src/main/java/com/hmdp/mapper/SeckillRequestMapper.java",
+    "first_line": 39,
+    "last_line": 42,
+    "sha256": "1149c3f833e8a208bcb4bffd5c1873de7aa286cd5b05a796d7602b8458d0b8c8"
+  },
+  {
+    "name": "order-create",
+    "file": "src/main/java/com/hmdp/service/SeckillRequestService.java",
+    "first_line": 332,
+    "last_line": 350,
+    "sha256": "57fb08f6d0075fde59137b8115d121547efafc3437533a74a08f1484b97ddf7d"
+  },
+  {
+    "name": "compensate",
+    "file": "src/main/java/com/hmdp/service/SeckillRequestService.java",
+    "first_line": 278,
+    "last_line": 287,
+    "sha256": "57fb08f6d0075fde59137b8115d121547efafc3437533a74a08f1484b97ddf7d"
+  },
+  {
+    "name": "shop-sent",
+    "file": "src/main/java/com/hmdp/mapper/ShopSyncEventMapper.java",
+    "first_line": 33,
+    "last_line": 35,
+    "sha256": "a4f84d150bf090d6c8c4f1e534e25cd037dc7d39c8a9949655be6622abff5d5d"
+  },
+  {
+    "name": "shop-read-version",
+    "file": "src/main/java/com/hmdp/mapper/ShopSyncEventMapper.java",
+    "first_line": 49,
+    "last_line": 51,
+    "sha256": "a4f84d150bf090d6c8c4f1e534e25cd037dc7d39c8a9949655be6622abff5d5d"
+  },
+  {
+    "name": "shop-es-write",
+    "file": "src/main/java/com/hmdp/service/impl/ShopSearchServiceImpl.java",
+    "first_line": 340,
+    "last_line": 353,
+    "sha256": "e71946a2ad020427950803f23d3a106a54f84c7674b0cd576c752ddaf70fe38a"
+  },
+  {
+    "name": "blog-save",
+    "file": "src/main/java/com/hmdp/service/impl/BlogServiceImpl.java",
+    "first_line": 69,
+    "last_line": 72,
+    "sha256": "134617b8434b0bccca577a39ee74a11615b0e73c9813de585b13f3077c09d283"
+  },
+  {
+    "name": "blog-like",
+    "file": "src/main/java/com/hmdp/service/impl/BlogServiceImpl.java",
+    "first_line": 107,
+    "last_line": 124,
+    "sha256": "134617b8434b0bccca577a39ee74a11615b0e73c9813de585b13f3077c09d283"
+  },
+  {
+    "name": "follow-lock",
+    "file": "src/main/java/com/hmdp/service/impl/FollowServiceImpl.java",
+    "first_line": 50,
+    "last_line": 67,
+    "sha256": "cf610880d0558badd446eae314b19ec12fe6b438c8a39042159bffa8f702752d"
+  },
+  {
+    "name": "merchant-update",
+    "file": "src/main/java/com/hmdp/service/impl/ShopServiceImpl.java",
+    "first_line": 78,
+    "last_line": 90,
+    "sha256": "393436dfb257cab81a7ed2b527504531cfd9b5be735272b2d5359149ac868888"
+  },
+  {
+    "name": "check-lua",
+    "file": "src/main/resources/seckill-check.lua",
+    "first_line": 7,
+    "last_line": 25,
+    "sha256": "2048091eef20d131bc1aeeeab864db3ddab0ea72e95f84128840d9f9c51fef2f"
+  },
+  {
+    "name": "prepare-two-transactions",
+    "file": "src/main/java/com/hmdp/service/SeckillRequestService.java",
+    "first_line": 143,
+    "last_line": 179,
+    "sha256": "57fb08f6d0075fde59137b8115d121547efafc3437533a74a08f1484b97ddf7d"
+  },
+  {
+    "name": "initialize-lock",
+    "file": "src/main/java/com/hmdp/service/SeckillRequestService.java",
+    "first_line": 87,
+    "last_line": 112,
+    "sha256": "57fb08f6d0075fde59137b8115d121547efafc3437533a74a08f1484b97ddf7d"
+  },
+  {
+    "name": "upload-name",
+    "file": "src/main/java/com/hmdp/controller/user/UploadController.java",
+    "first_line": 42,
+    "last_line": 56,
+    "sha256": "3dd7f82f38f52db7e150085ab4e32b16e6a40c3a35d08c2171a0ca89a848e07d"
+  }
+]

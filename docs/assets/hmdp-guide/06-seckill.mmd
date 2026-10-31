@@ -1,0 +1,20 @@
+sequenceDiagram
+ participant U as 用户
+ participant A as HTTP 入口
+ participant D as MySQL 申请表
+ participant T as 后台任务
+ participant R as Redis Lua
+ participant Q as RocketMQ
+ participant C as 落单消费者
+ U->>A: 申请抢购
+ A->>R: 只读预检
+ A->>D: 提交 INIT 申请
+ A-->>U: 返回申请编号，尚未落单
+ T->>D: 独立提交 UNKNOWN 预占意图
+ T->>R: 幂等预占
+ T->>D: 记录 READY 与 HELD
+ T->>Q: 发送固定身份消息
+ Q->>C: 投递下单通知
+ C->>D: 同事务扣库存、写订单、标成功
+ U->>A: 查询申请状态
+ A-->>U: SUCCEEDED 才显示抢购成功

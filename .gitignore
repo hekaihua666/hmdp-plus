@@ -1,0 +1,86 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### 本地配置与认证文件：保留在本机，禁止进入留档 ###
+/src/main/resources/application.yaml
+/src/main/resources/application-local.*
+/src/main/resources/application-dev.*
+/src/main/resources/application-prod.*
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.jks
+
+### 日志、运行结果和本地工具元数据 ###
+*.log
+*.pid
+/.github/modernize/
+/_backups/
+/body.json
+/img.png
+/*_result*.txt
+/src/main/resources/nginx-1.18.0/logs/
+/src/main/resources/nginx-1.18.0/temp/
+/src/main/resources/nginx-1.18.0/*_temp/
+
+### 本地数据库导出及重复二进制包 ###
+/hmdp.sql
+*.zip
+*.exe
+*.dll
+
+### Docker 部署：运行时数据与体积大的第三方二进制 ###
+# Redis 快照会在容器运行时不断被重写，属于运行时数据，不入库
+/deploy/infra/redis/*.rdb
+# IK 分词器为第三方二进制（约 9.4MB 词典+jar），按 Dockerfile 从本机复制生成；
+# 如需在新环境重建镜像，请按 deploy/README.md 说明重新准备该目录
+/deploy/infra/elasticsearch/plugins/
+
+### Python 脚本字节码缓存 ###
+__pycache__/
+*.pyc
+
+# Local IDEA secrets and load-test credentials
+/config/application-local.properties
+/deploy/loadtest/tokens*.txt
+/deploy/loadtest/*ids*.txt
+/deploy/infra/mysql/init/01-hmdp.sql
+
+*.tar.gz
+/docs/*交接*.md
+
+/codex-continuity/

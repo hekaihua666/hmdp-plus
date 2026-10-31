@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我的店铺 · 黑马点评商户工作台</title>
+  <link rel="stylesheet" href="../css/element.css"><link rel="stylesheet" href="./merchant.css">
+</head>
+<body>
+<div id="app" v-cloak class="workspace" v-loading="loading">
+  <aside class="sidebar"><div class="brand-mark">点评<span>商户工作台</span></div>
+    <div class="nav-label">店铺管理</div><div class="nav-item"><i class="el-icon-house"></i> 我的店铺</div>
+    <div class="nav-label">营销工具</div><a class="nav-item" href="./voucher.html"><i class="el-icon-ticket"></i> 发布优惠券</a>
+    <div class="sidebar-footer"><span class="status-dot"></span> 专属店铺管理空间</div>
+  </aside>
+  <div class="workspace-main">
+    <header class="topbar"><span>商户工作台 <span class="breadcrumb">/ 我的店铺</span></span>
+      <div class="account"><span>{{merchant.name || merchant.username}}</span><el-button type="text" :loading="loggingOut" @click="logout">退出登录</el-button></div>
+    </header>
+    <main class="page-content">
+      <div class="page-heading"><div><div class="eyebrow">店铺管理</div><h1>我的店铺</h1><p class="muted">维护店铺信息，让顾客更容易找到你。</p></div>
+        <a v-if="shop" :href="'/shop-detail.html?id='+shop.id" target="_blank" rel="noopener" class="preview-link">查看顾客页面 <i class="el-icon-top-right"></i></a>
+      </div>
+      <el-alert v-if="pageError" :title="pageError" type="error" :closable="false" show-icon class="page-alert"></el-alert>
+      <el-button v-if="pageError" @click="load">重新加载</el-button>
+      <template v-if="shop">
+        <section class="shop-summary"><div class="shop-avatar"><img v-if="cover" :src="cover" alt="店铺封面"><i v-else class="el-icon-picture-outline"></i></div>
+          <div class="summary-title"><h2>{{shop.name}}</h2><span class="muted">店铺编号 {{shop.id}} · {{categoryName}}</span></div>
+          <div class="summary-stat"><strong>{{((shop.score || 0)/10).toFixed(1)}}</strong><span>顾客评分</span></div>
+          <div class="summary-stat"><strong>{{shop.comments || 0}}</strong><span>评价数量</span></div>
+          <div class="summary-stat"><strong>{{shop.sold || 0}}</strong><span>累计销量</span></div>
+        </section>
+        <section class="edit-card"><div class="card-heading"><h2>店铺信息</h2><span class="muted">评分、评价数量和销量由业务记录产生</span></div>
+          <el-form ref="form" :model="form" :rules="rules" label-position="top" @submit.native.prevent="save">
+            <div class="form-grid">
+              <el-form-item label="店铺名称" prop="name"><el-input v-model="form.name" maxlength="128" show-word-limit></el-input></el-form-item>
+              <el-form-item label="店铺分类" prop="typeId"><el-select v-model="form.typeId" placeholder="请选择分类"><el-option v-for="type in types" :key="type.id" :label="type.name" :value="type.id"></el-option></el-select></el-form-item>
+              <el-form-item label="所在商圈"><el-input v-model="form.area" maxlength="128" placeholder="例如：陆家嘴"></el-input></el-form-item>
+              <el-form-item label="营业时间"><el-input v-model="form.openHours" maxlength="32" placeholder="例如：10:00–22:00"></el-input></el-form-item>
+              <el-form-item label="详细地址" prop="address" class="full-width"><el-input v-model="form.address" maxlength="255" placeholder="街道、门牌号及楼层"></el-input></el-form-item>
+              <el-form-item label="人均价格（元）" prop="avgPrice"><el-input-number v-model="form.avgPrice" :min="0" :max="1000000" :precision="0" controls-position="right"></el-input-number></el-form-item>
+              <div class="coordinate-fields"><el-form-item label="经度" prop="x"><el-input-number v-model="form.x" :min="-180" :max="180" :precision="6" :controls="false"></el-input-number></el-form-item><el-form-item label="纬度" prop="y"><el-input-number v-model="form.y" :min="-90" :max="90" :precision="6" :controls="false"></el-input-number></el-form-item></div>
+              <el-form-item label="店铺图片地址" prop="images" class="full-width"><el-input type="textarea" :rows="2" v-model="form.images" maxlength="1024" placeholder="填写图片地址，多张图片用英文逗号分隔"></el-input><div class="field-note">支持 http(s) 图片地址或本地图片路径，第一张作为封面。</div>
+                <div class="image-previews"><div v-for="(url,index) in imageUrls" :key="index"><img :src="url" :alt="'店铺图片 '+(index+1)"><span>{{index===0?'封面':'图片 '+(index+1)}}</span></div></div>
+              </el-form-item>
+            </div>
+            <div class="form-actions"><span class="muted">{{dirty?'有尚未保存的修改':'当前信息已保存'}}</span><div><el-button :disabled="saving || !dirty" @click="restore">还原修改</el-button><el-button type="primary" native-type="submit" :loading="saving" :disabled="!dirty || loading">保存修改</el-button></div></div>
+          </el-form>
+        </section>
+      </template>
+    </main>
+  </div>
+</div>
+<script src="../js/vue.js"></script><script src="../js/axios.min.js"></script><script src="../js/element.js"></script><script src="./merchant.js?v=20261012-platform"></script>
+</body></html>

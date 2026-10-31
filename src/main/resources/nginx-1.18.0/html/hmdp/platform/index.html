@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>商户管理 · 黑马点评平台</title><link rel="stylesheet" href="../css/element.css"><link rel="stylesheet" href="./platform.css?v=20261012-shops"></head>
+<body><div id="app" class="platform-layout" v-cloak>
+  <aside class="sidebar"><div class="brand">黑马点评<span>平台管理中心</span></div><nav class="sidebar-nav"><div class="nav-label">运营管理</div><a class="nav-item" href="./index.html" aria-current="page"><i class="el-icon-office-building"></i>商户管理</a></nav><div class="sidebar-footer"><a href="/index.html" target="_blank" rel="noopener">打开顾客首页 ↗</a><a href="../merchant/login.html" target="_blank" rel="noopener">打开商户工作台 ↗</a></div></aside>
+  <main class="main"><header class="topbar"><div class="topbar-title">平台管理 / 商户管理</div><div class="topbar-right"><span class="admin-badge"><i class="el-icon-user"></i>平台管理员 · {{admin.username}}</span><el-button size="small" :loading="loggingOut" @click="logout">退出登录</el-button></div></header>
+    <section class="page-heading"><div><h1>商户管理</h1><p>按门店查找商户，查看门店信息并管理账号状态。</p></div><div class="count-pill"><strong>{{total}}</strong>个匹配商户</div></section>
+    <section class="management-card"><div class="toolbar">
+      <el-input class="toolbar-search" v-model.trim="keyword" clearable placeholder="搜索店名、商圈或商户账号" prefix-icon="el-icon-search" maxlength="64" @keyup.enter.native="search" @clear="search"></el-input>
+      <el-select class="toolbar-status" v-model="status" clearable placeholder="全部状态" @change="search"><el-option label="启用" :value="1"></el-option><el-option label="已封禁" :value="0"></el-option></el-select>
+      <el-button type="primary" @click="search" :disabled="loading">查询</el-button><el-button class="toolbar-refresh" icon="el-icon-refresh" @click="load" :disabled="loading">刷新</el-button>
+    </div><el-alert v-if="error" class="page-error" :title="error" type="error" :closable="false" show-icon></el-alert>
+    <!-- 列表内部滚动，表头与分页保持可见，操作人员无需滚过整页才能翻页。 -->
+    <div class="table-wrap"><el-table :data="rows" height="calc(100vh - 405px)" v-loading="loading" empty-text="没有匹配的商户账号" row-key="id">
+      <el-table-column label="门店信息" min-width="290"><template slot-scope="scope"><div class="shop-cell">
+        <!-- 沿用门店真实图片字段；外链失效时显示占位，不留破图。 -->
+        <el-image class="shop-cover" :src="scope.row.shopCover || ''" fit="cover" :alt="shopName(scope.row.shopName) || '未绑定门店'"><div slot="error" class="cover-placeholder"><i class="el-icon-office-building"></i></div></el-image>
+        <div class="shop-info"><a v-if="scope.row.shopId" class="shop-title" :href="'/shop-detail.html?id='+scope.row.shopId" target="_blank" rel="noopener">{{shopName(scope.row.shopName)}} <i class="el-icon-top-right"></i></a><div v-else class="shop-title">{{shopName(scope.row.name)}}</div>
+          <div class="shop-meta"><span class="category-tag" v-if="scope.row.shopTypeName">{{scope.row.shopTypeName}}</span><span v-if="scope.row.shopArea">{{scope.row.shopArea}}</span><span v-if="!scope.row.shopId" class="no-shop">暂未绑定门店</span></div>
+          <div class="shop-address" :title="shopName(scope.row.shopAddress)">{{shopName(scope.row.shopAddress)}}</div>
+        </div></div></template></el-table-column>
+      <el-table-column label="商户账号" min-width="150"><template slot-scope="scope"><div class="account-name">{{scope.row.username}}</div><div class="account-id">商户 ID {{scope.row.id}}</div><div class="account-note" v-if="shopName(scope.row.name)!==shopName(scope.row.shopName)">{{shopName(scope.row.name)}}</div></template></el-table-column>
+      <el-table-column label="账号状态" width="90"><template slot-scope="scope"><span :class="['status-badge',scope.row.status===1 ? 'is-enabled' : 'is-banned']"><span class="status-dot"></span>{{scope.row.status===1 ? '启用' : '已封禁'}}</span></template></el-table-column>
+      <el-table-column label="操作" width="90" fixed="right"><template slot-scope="scope"><el-button :type="scope.row.status===1 ? 'danger' : 'primary'" plain size="mini" :loading="updatingId===scope.row.id" :disabled="loading || (updatingId!=null && updatingId!==scope.row.id)" @click="changeStatus(scope.row)">{{scope.row.status===1 ? '封禁' : '解封'}}</el-button></template></el-table-column>
+    </el-table></div><footer class="table-footer"><span class="table-caption">每页 {{pageSize}} 个商户 · 点击店名查看门店详情</span><el-pagination background layout="prev, pager, next, total" :current-page="current" :page-size="pageSize" :total="total" @current-change="changePage"></el-pagination></footer></section>
+  </main></div>
+<script src="../js/vue.js"></script><script src="../js/axios.min.js"></script><script src="../js/element.js"></script><script src="./api.js?v=20261012-platform"></script><script src="./platform.js?v=20261012-shops"></script></body></html>

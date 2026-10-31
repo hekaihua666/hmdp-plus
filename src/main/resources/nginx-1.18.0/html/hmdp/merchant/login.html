@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>商户登录 · 黑马点评</title>
+  <link rel="stylesheet" href="../css/element.css">
+  <link rel="stylesheet" href="./merchant.css">
+</head>
+<body class="login-body">
+<div id="app" v-cloak class="login-layout">
+  <section class="login-intro">
+    <div class="brand-mark">点评<span>商户工作台</span></div>
+    <div class="intro-content"><div class="eyebrow">为你的店铺，做好每一次展示</div>
+      <h1>店铺信息管理<br>在电脑上，轻松完成。</h1>
+      <p>维护地址、营业时间和店铺图片，<br>让顾客看到准确的店铺信息。</p>
+      <div class="intro-tags"><span>我的店铺</span><span>信息维护</span><span>图片预览</span></div>
+    </div>
+    <div class="intro-footer">黑马点评 · 商户管理</div>
+  </section>
+  <main class="login-card">
+    <div class="eyebrow">欢迎回来</div><h2>登录商户工作台</h2>
+    <p class="muted">请使用已开通的商户账号登录。</p>
+    <el-form @submit.native.prevent="login" label-position="top">
+      <el-form-item label="商户账号"><el-input v-model.trim="username" autocomplete="username" maxlength="32" placeholder="请输入商户账号"></el-input></el-form-item>
+      <el-form-item label="密码"><el-input v-model="password" type="password" show-password autocomplete="current-password" maxlength="64" placeholder="请输入密码"></el-input></el-form-item>
+      <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon class="login-error"></el-alert>
+      <el-button type="primary" native-type="submit" :loading="loading" class="login-button">登录工作台</el-button>
+    </el-form>
+    <p class="login-note">账号尚未开通？请联系店铺维护人员。</p>
+    <a href="/index.html" class="text-link">返回顾客首页 ↗</a>
+  </main>
+</div>
+<script src="../js/vue.js"></script><script src="../js/axios.min.js"></script><script src="../js/element.js"></script>
+<script>
+// 商户 token 使用独立存储键，不读取或覆盖消费者 token。
+new Vue({el:'#app', data:{username:'',password:'',loading:false,error:''},
+  created(){ if(sessionStorage.getItem('merchant_token')) location.replace('./index.html'); },
+  methods:{ async login(){
+    if(this.loading) return;
+    if(!this.username || !this.password){this.error='请填写账号和密码';return;}
+    this.loading=true;this.error='';
+    try {
+      const response=await axios.post('/api/admin/merchant/login',{username:this.username,password:this.password},{timeout:10000});
+      if(!response.data.success) throw new Error(response.data.errorMsg);
+      sessionStorage.setItem('merchant_token',response.data.data);
+      this.password='';location.replace('./index.html');
+    } catch(error){this.error=error.message==='Network Error'?'无法连接服务，请稍后重试':(error.response && error.response.data.errorMsg)||error.message;}
+    finally{this.loading=false;}
+  }}
+});
+</script>
+</body></html>

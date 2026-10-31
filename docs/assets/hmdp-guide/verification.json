@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-30 19:35",
+  "chapters": 12,
+  "images": 22,
+  "source_excerpts": 18,
+  "broken_local_links": [],
+  "markdown_lines": 1423,
+  "markdown_sha256": "ba9e6f67421c470dda22f46da892f0b14bca33a73fe18186b59b8181d4e478a3",
+  "browser": "22 images loaded; no desktop/mobile horizontal overflow",
+  "runtime_pid": 12448,
+  "supplemented_topics": [
+    "两段 REQUIRES_NEW",
+    "check 与 reserve",
+    "条件更新与悲观锁",
+    "Redisson 3.20.0 watchdog",
+    "Redis ID 时钟回拨",
+    "上传与 Nginx 静态文件"
+  ]
+}

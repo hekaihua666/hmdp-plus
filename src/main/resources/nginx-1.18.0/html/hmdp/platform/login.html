@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>平台登录 · 黑马点评</title><link rel="stylesheet" href="../css/element.css"><link rel="stylesheet" href="./platform.css?v=20261012-platform"></head>
+<body class="login-body"><div id="app" class="login-layout" v-cloak>
+  <section class="login-intro"><div class="brand">黑马点评<span>平台管理中心</span></div>
+    <div><div class="eyebrow">商户管理，从一个入口开始</div><h1>商户账号管理<br>在一个页面完成。</h1><p>查看商户账号与关联店铺，<br>统一管理账号的启用与封禁状态。</p><div class="intro-tags"><span>商户查询</span><span>状态管理</span><span>店铺查看</span></div></div>
+    <div class="intro-footer">黑马点评 · 平台运营</div></section>
+  <main class="login-card"><div class="eyebrow">平台管理员入口</div><h2>登录平台管理中心</h2><p class="muted">请使用平台管理员账号登录。</p>
+    <el-form label-position="top" @submit.native.prevent="login">
+      <el-form-item label="管理员账号"><el-input v-model.trim="username" maxlength="32" autocomplete="username" placeholder="请输入管理员账号"></el-input></el-form-item>
+      <el-form-item label="密码"><el-input v-model="password" type="password" maxlength="64" autocomplete="current-password" show-password placeholder="请输入密码"></el-input></el-form-item>
+      <el-alert v-if="error" :title="error" type="error" :closable="false" show-icon class="login-error"></el-alert>
+      <el-button type="primary" native-type="submit" :loading="loading" class="login-button">登录平台</el-button>
+    </el-form><p class="login-note">管理自己店铺的商户，请使用商户工作台。</p><a href="../merchant/login.html">前往商户工作台 ↗</a>
+  </main></div>
+<script src="../js/vue.js"></script><script src="../js/axios.min.js"></script><script src="../js/element.js"></script><script src="./api.js?v=20261012-platform"></script>
+<script>
+new Vue({el:'#app',data:{username:'',password:'',loading:false,error:''},
+  created(){if(sessionStorage.getItem('platform_token')) location.replace('./index.html');},
+  methods:{async login(){
+    if(this.loading) return;
+    if(!this.username || !this.password){this.error='请填写账号和密码';return;}
+    this.loading=true;this.error='';
+    try{const token=await platformApi.post('/platform/admin/login',{username:this.username,password:this.password});
+      sessionStorage.setItem('platform_token',token);this.password='';location.replace('./index.html');
+    }catch(error){this.error=error.message;}finally{this.loading=false;}
+  }}
+});
+</script></body></html>

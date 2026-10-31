@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>商户发现 · 黑马点评</title>
+  <link rel="stylesheet" href="./css/element.css"><link rel="stylesheet" href="./css/main.css"><link rel="stylesheet" href="./css/shop-search.css">
+</head><body><div id="app" v-cloak>
+  <div class="header">
+    <button class="back-button" @click="goBack" aria-label="返回"><i class="el-icon-arrow-left"></i></button>
+    <div class="header-title">{{selectedTypeName === '全部分类' ? '发现商户' : selectedTypeName}}</div>
+    <el-autocomplete class="header-search" v-model="params.keyword" placeholder="店名 / 商圈 / 拼音" size="small" clearable
+      :fetch-suggestions="querySearch" popper-class="shop-suggest-popper" @select="handleSuggest"
+      @keyup.enter.native="resetAndSearch" @clear="resetAndSearch"><i slot="prefix" class="el-icon-search"></i></el-autocomplete>
+  </div>
+  <!-- 所有下拉共用一个全宽容器，手机和桌面都可以完整展示区间与数量。 -->
+  <div class="filter-shell">
+    <div class="filter-bar"><button v-for="tab in tabs" :key="tab.key" class="filter-item"
+      :class="{active:tab.active,open:panel===tab.key}" :title="tab.label" :aria-expanded="panel===tab.key" @click="togglePanel(tab.key)">
+      <span>{{tab.label}}</span><i class="el-icon-arrow-down"></i></button></div>
+    <div class="filter-panel" v-if="panel">
+      <div class="panel-heading"><strong>{{panelTitle}}</strong><button class="text-button" @click="panel=null">收起 <i class="el-icon-close"></i></button></div>
+      <p class="panel-note" v-if="panel==='price'||panel==='score'">当前结果分布 · 已包含所选分类、关键词、距离及价格 / 评分条件</p>
+      <p class="panel-note" v-else-if="panel==='radius'">当前结果的累计数量 · 以杭州参考位置计算，尚未获取设备定位；各范围数量不可相加。</p>
+      <p class="panel-note" v-else>选择后即时更新，可与其他条件组合使用。</p>
+      <div v-if="aggState==='error' && (panel==='price'||panel==='score'||panel==='radius')" class="panel-note">统计暂不可用 <button class="text-button" @click="queryShops">重试加载</button></div>
+      <div class="option-grid" v-if="panel==='type'">
+        <button class="filter-option" :class="{selected:!params.typeId}" @click="selectType(null)"><span>全部分类</span></button>
+        <button class="filter-option" v-for="t in types" :key="t.id" :class="{selected:params.typeId===t.id}" @click="selectType(t.id)"><span>{{t.name}}</span><i v-if="params.typeId===t.id" class="el-icon-check"></i></button>
+      </div>
+      <div class="option-grid" v-if="panel==='price'">
+        <button class="filter-option" :class="{selected:!priceRange}" @click="selectPrice(null)"><span>全部价格</span></button>
+        <button class="filter-option" v-for="p in priceOptions" :key="p.label" :class="{selected:priceRange===p.label}" @click="selectPrice(p)">
+          <span>{{p.label}}</span><span class="count">{{countLabel(aggPrice,p.label)}}</span><b class="option-meter" :style="{width:barWidth(aggPrice,p.label)}"></b></button>
+      </div>
+      <div class="option-grid" v-if="panel==='score'">
+        <button class="filter-option" :class="{selected:params.minScore==null}" @click="selectScore(null)"><span>全部评分</span></button>
+        <button class="filter-option" v-for="s in scoreOptions" :key="s.label" :class="{selected:params.minScore===s.min}" @click="selectScore(s)">
+          <span>{{s.label}}</span><span class="count">{{countLabel(aggScore,s.label)}}</span><b class="option-meter" :style="{width:barWidth(aggScore,s.label)}"></b></button>
+      </div>
+      <div class="option-grid" v-if="panel==='radius'">
+        <button class="filter-option" :class="{selected:params.radius==null}" @click="selectRadius(null)"><span>不限距离</span><span class="count">{{aggState==='ready' ? total+' 家' : aggState==='error' ? '暂不可用' : '统计中…'}}</span></button>
+        <button class="filter-option" v-for="r in radiusOptions" :key="r.value" :class="{selected:params.radius===r.value}" @click="selectRadius(r)"><span>{{r.label}}</span><span class="count">{{countLabel(aggDistance,r.label)}}</span><b class="option-meter" :style="{width:barWidth(aggDistance,r.label)}"></b></button>
+      </div>
+      <div class="option-grid" v-if="panel==='sort'">
+        <button class="filter-option" :class="{selected:!params.sort}" @click="selectSort('')"><span>综合排序</span></button>
+        <button class="filter-option" :class="{selected:params.sort==='distance'}" @click="selectSort('distance')"><span>距离最近</span></button>
+        <button class="filter-option" :class="{selected:params.sort==='price'}" @click="selectSort('price')"><span>价格最低</span></button>
+        <button class="filter-option" :class="{selected:params.sort==='score'}" @click="selectSort('score')"><span>评分最高</span></button>
+      </div>
+    </div>
+  </div>
+  <button v-if="panel" class="filter-backdrop" @click="panel=null" aria-label="关闭筛选"></button>
+  <div class="result-info"><div><strong>{{total==null ? (aggState==='error' ? '已加载 '+shops.length+' 家 · 统计暂不可用' : '正在查找商户…') : '找到 '+total+' 家商户'}}</strong><small>{{locationHint}}</small></div><button class="text-button" @click="clearFilters">重置筛选</button></div>
+  <div class="shop-list" ref="list" @scroll="onScroll">
+    <div class="shop-box" v-for="s in shops" :key="s.id" @click="toDetail(s.id)">
+      <div class="shop-img"><img :src="s.images" alt="商户封面" loading="lazy"></div>
+      <div class="shop-info"><div class="shop-title" v-html="util.displayText(s.name)"></div>
+        <div class="shop-rate"><el-rate disabled :value="s.score/10" show-score text-color="#f63"></el-rate><small>{{s.comments}} 条评价</small><span class="demo-tag" v-if="s.name.includes('演示')">评分为模拟值</span></div>
+        <div class="shop-area"><span v-html="s.area"></span><span v-if="s.distance!=null">{{s.distance<1000 ? s.distance.toFixed(0)+' m' : (s.distance/1000).toFixed(1)+' km'}}</span></div>
+        <div class="shop-avg">¥ {{s.avgPrice}} <small>/ 人</small></div><div class="shop-address" v-html="util.displayText(s.address)"></div></div>
+    </div>
+    <div class="empty-state" v-if="!shops.length&&!loading&&!error"><i class="el-icon-search"></i>没有符合条件的商户<br><button class="text-button" @click="clearFilters">放宽筛选条件</button></div>
+    <div class="load-state" v-if="loading">正在加载…</div>
+    <div class="load-state" v-else-if="error">{{error}} <button class="text-button" @click="queryShops">重试</button></div>
+    <div class="load-state" v-else-if="shops.length"><button v-if="!finished" class="text-button" @click="queryShops">加载更多</button><span v-else>已展示全部结果</span></div>
+  </div>
+</div><script src="./js/vue.js"></script><script src="./js/axios.min.js"></script><script src="./js/element.js"></script><script src="./js/common.js?v=20261012-ui"></script><script src="./js/shop-search.js?v=20261016"></script></body></html>

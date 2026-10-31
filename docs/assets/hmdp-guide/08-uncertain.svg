@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 499.7929999999999 948.48" width="499.7929999999999" height="948.48" style="--bg:#ffffff;--fg:#17345c;--line:#607d9f;--accent:#2a8a76;--muted:#39516c;--surface:#edf4fb;--border:#7094ba;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Microsoft%20YaHei:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Microsoft YaHei', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="A" data-to="B" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="195.24749999999995,68.9 195.24749999999995,108.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="B" data-to="C" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="195.24749999999995,145.8 195.24749999999995,185.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="C" data-to="D" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="成功" points="166.9658333333333,327.20833333333337 166.9658333333333,670.0800000000002 102.62199999999999,670.0800000000002 102.62199999999999,742.3800000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="C" data-to="E" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="网络超时" points="223.52916666666664,327.2083333333333 223.52916666666664,383.49 287.87299999999993,383.49 287.87299999999993,455.79" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="287.87299999999993,492.69 287.87299999999993,532.69" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="F" data-to="G" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="287.87299999999993,569.5899999999999 287.87299999999993,609.5899999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="G" data-to="H" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="可确认" points="259.5913333333333,750.9983333333333 259.5913333333333,807.28 195.61799999999994,807.28 195.61799999999994,879.5799999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="G" data-to="I" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="凭据缺失" points="316.15466666666657,750.9983333333333 316.15466666666657,807.28 380.12799999999993,807.28 380.12799999999993,879.5799999999999" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="C" data-to="D" data-label="成功">
+  <rect x="81.62199999999999" y="677.0800000000002" width="41.41" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="102.32699999999998" y="692.2300000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">成功</text>
+</g>
+<g class="edge-label" data-from="C" data-to="E" data-label="网络超时">
+  <rect x="254.8729999999999" y="390.49" width="65.17" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="287.4579999999999" y="405.64" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">网络超时</text>
+</g>
+<g class="edge-label" data-from="G" data-to="H" data-label="可确认">
+  <rect x="168.61799999999994" y="814.28" width="53.29" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="195.26299999999995" y="829.43" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">可确认</text>
+</g>
+<g class="edge-label" data-from="G" data-to="I" data-label="凭据缺失">
+  <rect x="347.12799999999993" y="814.28" width="65.17" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="379.7129999999999" y="829.43" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">凭据缺失</text>
+</g>
+<g class="node" data-id="A" data-label="事务提交 UNKNOWN" data-shape="rectangle">
+  <rect x="111.28749999999998" y="32" width="167.91999999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="195.24749999999995" y="50.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">事务提交 UNKNOWN</text>
+</g>
+<g class="node" data-id="B" data-label="调用 Redis 预占" data-shape="rectangle">
+  <rect x="125.36649999999996" y="108.9" width="139.762" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="195.24749999999995" y="127.35000000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">调用 Redis 预占</text>
+</g>
+<g class="node" data-id="C" data-label="取得明确结果？" data-shape="diamond">
+  <polygon points="195.24749999999995,185.79999999999998 280.0925,270.645 195.24749999999995,355.49 110.40249999999995,270.645" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="195.24749999999995" y="270.645" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">取得明确结果？</text>
+</g>
+<g class="node" data-id="D" data-label="READY 与 HELD" data-shape="rectangle">
+  <rect x="32" y="742.3800000000001" width="141.24399999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="102.62199999999999" y="760.8300000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">READY 与 HELD</text>
+</g>
+<g class="node" data-id="E" data-label="保留 INIT 与 UNKNOWN" data-shape="rectangle">
+  <rect x="197.24399999999997" y="455.79" width="181.25799999999995" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="287.87299999999993" y="474.24" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">保留 INIT 与 UNKNOWN</text>
+</g>
+<g class="node" data-id="F" data-label="同一 orderId 恢复核查" data-shape="rectangle">
+  <rect x="197.98499999999996" y="532.69" width="179.77599999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="287.87299999999993" y="551.1400000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">同一 orderId 恢复核查</text>
+</g>
+<g class="node" data-id="G" data-label="凭据是否充分？" data-shape="diamond">
+  <polygon points="287.87299999999993,609.5899999999999 372.71799999999996,694.435 287.87299999999993,779.28 203.02799999999993,694.435" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="287.87299999999993" y="694.435" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">凭据是否充分？</text>
+</g>
+<g class="node" data-id="H" data-label="继续推进或补偿" data-shape="rectangle">
+  <rect x="122.77299999999994" y="879.5799999999999" width="145.69" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="195.61799999999994" y="898.03" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">继续推进或补偿</text>
+</g>
+<g class="node" data-id="I" data-label="保留状态，等待核查" data-shape="rectangle">
+  <rect x="292.46299999999997" y="879.5799999999999" width="175.32999999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="380.12799999999993" y="898.03" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">保留状态，等待核查</text>
+</g>
+</svg>

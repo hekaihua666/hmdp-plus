@@ -1,0 +1,16 @@
+sequenceDiagram
+ participant W as 后台 prepare
+ participant D as MySQL
+ participant R as Redis
+ W->>D: BEGIN T1，锁申请并写 UNKNOWN
+ D-->>W: COMMIT T1，释放行锁
+ W->>D: BEGIN T2，重新锁行和检查状态
+ W->>R: reserve，同一 orderId
+ alt 收到预占成功
+ R-->>W: 返回 0
+ W->>D: 保存 READY 与 HELD
+ D-->>W: COMMIT T2
+ else 预占响应未知或后续异常
+ W->>D: ROLLBACK T2
+ D-->>W: 保留 T1 已提交的 UNKNOWN
+ end

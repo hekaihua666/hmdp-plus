@@ -1,0 +1,23 @@
+# 云服务器覆盖配置。与 deploy/compose.yaml 叠加使用：
+#   docker compose -f compose.yaml -f cloud/compose.cloud.yaml up -d --build
+#
+# 只覆盖两件事（都是为了国内云服务器拉镜像/依赖更快）：
+#   1. 后端改用根目录的 Dockerfile.cloud（Maven 走阿里云镜像）
+#   2. ES 改用 Docker Hub 的官方镜像 + 本地 IK 插件（docker.elastic.co 在国内很慢）
+# 其余服务（MySQL / Redis / Nginx / RocketMQ）沿用 compose.yaml 不变。
+#
+# 路径说明：compose 把相对路径按「第一个 -f 文件所在目录」解析，也就是 deploy/。
+#   后端 context = ..       → 项目根目录（Dockerfile.cloud 在这里）
+#   ES   context = .        → deploy 目录（IK 插件在这里）
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile.cloud
+
+  elasticsearch:
+    build:
+      context: .
+      dockerfile: cloud/elasticsearch.Dockerfile
+    image: hmdp-elasticsearch:7.17.24-ik

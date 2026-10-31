@@ -1,0 +1,187 @@
+# HMDP 全栈中间件编排（单一 Compose 项目）
+#   MySQL(3307) / Redis(6379) / Elasticsearch(9200) / Nginx(8080) / RocketMQ(9876,10911)
+#
+# 本文件由原 deploy/infra/compose.yaml 与 deploy/rocketmq/compose.yaml 合并而来。
+# ⚠️ 关键：底部所有数据卷都用 name: 锁死了「原项目前缀的卷名」，
+#    因此合并成一个项目后，仍然复用既有数据卷，不会新建空卷、不会丢数据。
+name: hmdp
+
+services:
+  # ==================== 数据 / 缓存 / 搜索 / 前端 ====================
+
+  mysql:
+    image: mysql:8.0
+    container_name: hmdp-mysql
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3307:3306"
+    environment:
+      # 密码走 .env（已被 gitignore），不写死进仓库
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?请在项目根目录 .env 里设置 DB_PASSWORD}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # 仅数据卷为空时执行；已有数据时忽略
+      - ./infra/mysql/init:/docker-entrypoint-initdb.d:ro
+
+  redis:
+    image: redis:6.2.4
+    container_name: hmdp-redis
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    # 整目录挂载：启动读 /data/dump.rdb，快照也写回同一目录
+    volumes:
+      - ./infra/redis:/data
+    command: ["redis-server", "--appendonly", "no"]
+
+  elasticsearch:
+    build: ./infra/elasticsearch
+    image: hmdp-elasticsearch:7.17.24-ik
+    container_name: hmdp-es
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - TZ=Asia/Shanghai
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+
+  nginx:
+    image: nginx:alpine
+    container_name: hmdp-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # 直接挂载项目里已有的前端资源，不复制。
+      # 注意：这里已经包含 imgs 目录（静态图片 + 用户上传的图片都在里面），
+      # 不能再单独挂一个空目录到 hmdp/imgs，否则会把原有图片全遮住（图标/封面全变裂图）。
+      - ../src/main/resources/nginx-1.18.0/html:/usr/share/nginx/html:ro
+    depends_on:
+      backend:
+        condition: service_started
+
+  # ==================== 后端应用 ====================
+
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: hmdp-backend:1.0-SNAPSHOT
+    container_name: hmdp-backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/hmdp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:?请在项目根目录 .env 里设置 DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      ES_HOST: elasticsearch
+      ES_PORT: 9200
+      ROCKETMQ_NAME_SERVER: namesrv:9876
+      # 生产默认 info。debug 会为每个请求同步写大量日志，压测时直接把吞吐锁死。
+      # 要做 DEBUG/INFO 对照压测就把这行临时改成 debug 重建镜像。
+      APP_LOG_LEVEL: info
+      # Lettuce 连接池上限。默认 10 在高并发下会让请求线程排队借连接。
+      REDIS_POOL_MAX_ACTIVE: "200"
+      REDIS_POOL_MAX_IDLE: "50"
+      # 上传图片直接写进前端静态目录，Nginx 那边通过同一个挂载点就能读到。
+      IMAGES_DIR: /app/imgs
+      TZ: Asia/Shanghai
+    volumes:
+      # 前后端共用宿主机上的同一个 imgs 目录：
+      #   后端通过 /app/imgs 往里写图，Nginx 通过 /usr/share/nginx/html/hmdp/imgs 读图。
+      - ../src/main/resources/nginx-1.18.0/html/hmdp/imgs:/app/imgs
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_started
+      redis:
+        condition: service_started
+      elasticsearch:
+        condition: service_started
+      namesrv:
+        condition: service_started
+      broker:
+        condition: service_started
+
+  # ==================== RocketMQ ====================
+
+  volume-init:
+    image: apache/rocketmq:5.3.2
+    user: "0:0"
+    entrypoint: sh
+    command: ["-c", "chown -R 3000:3000 /mqstore /brokerlogs /namesrvlogs"]
+    volumes:
+      - broker-store:/mqstore
+      - broker-logs:/brokerlogs
+      - namesrv-logs:/namesrvlogs
+
+  namesrv:
+    image: apache/rocketmq:5.3.2
+    container_name: hmdp-namesrv
+    command: sh mqnamesrv
+    environment:
+      JAVA_OPT_EXT: -Xms128m -Xmx128m -Xmn64m
+    ports:
+      - "127.0.0.1:9876:9876"
+    volumes:
+      - namesrv-logs:/home/rocketmq/logs
+    restart: unless-stopped
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
+
+  broker:
+    image: apache/rocketmq:5.3.2
+    container_name: hmdp-broker
+    command: sh mqbroker -n namesrv:9876 -c /home/rocketmq/broker.conf
+    depends_on:
+      volume-init:
+        condition: service_completed_successfully
+      namesrv:
+        condition: service_started
+    environment:
+      JAVA_OPT_EXT: -Xms256m -Xmx256m -Xmn128m
+    ports:
+      - "127.0.0.1:10911:10911"
+      - "127.0.0.1:10909:10909"
+    volumes:
+      - ./rocketmq/broker.conf:/home/rocketmq/broker.conf:ro
+      - broker-store:/home/rocketmq/store
+      - broker-logs:/home/rocketmq/logs
+    restart: unless-stopped
+
+# ==================== 数据卷 ====================
+# 全部 external: true + name:，指向「原项目时代创建的」卷：
+#   1) 合并成一个项目后仍复用同一批卷，数据不迁移、不丢失；
+#   2) 不会出现 "created for project xxx" 警告，也不受新项目名下划线规则影响；
+#   3) external 卷不会被 `docker compose down -v` 删除，更安全。
+# 这些卷由 start-all.bat 用 `docker volume create` 预先确保存在（该命令幂等，不会动已有数据）。
+volumes:
+  mysql-data:
+    external: true
+    name: hmdp-infra_mysql-data
+  es-data:
+    external: true
+    name: hmdp-infra_es-data
+  broker-store:
+    external: true
+    name: hmdp-mq_broker-store
+  broker-logs:
+    external: true
+    name: hmdp-mq_broker-logs
+  namesrv-logs:
+    external: true
+    name: hmdp-mq_namesrv-logs

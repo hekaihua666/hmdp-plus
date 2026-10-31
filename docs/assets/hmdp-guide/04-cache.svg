@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 549.40525 818.9689999999999" width="549.40525" height="818.9689999999999" style="--bg:#ffffff;--fg:#17345c;--line:#607d9f;--accent:#2a8a76;--muted:#39516c;--surface:#edf4fb;--border:#7094ba;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Microsoft%20YaHei:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Microsoft YaHei', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<polyline class="edge" data-from="A" data-to="B" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="246.37700000000004,68.9 246.37700000000004,108.9" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="B" data-to="C" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="正常 JSON" points="209.69725000000005,218.93925000000002 209.69725000000005,343.919 97.43500000000003,343.919 97.43500000000003,519.969" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="B" data-to="D" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="空字符串" points="283.05675,218.93925000000002 283.05675,343.919 449.82025,343.919 449.82025,738.069 417.92116666666664,738.069 417.92116666666664,742.069" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="B" data-to="E" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="键不存在" points="246.37700000000004,255.619 246.37700000000004,355.919" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="246.37700000000004,392.81899999999996 246.37700000000004,432.8190000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="F" data-to="G" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="存在" points="223.03533333333337,549.5273333333334 223.03533333333337,584.869 145.41525000000007,584.869 145.41525000000004,665.169" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="F" data-to="H" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="不存在" points="269.7186666666667,549.5273333333334 269.7186666666667,600.869 347.33875,600.869 347.33875,665.169" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="G" data-to="I" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="145.41525000000004,702.069 145.41525000000007,742.069" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="H" data-to="D" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="347.33875,702.069 347.33875,738.069 379.23783333333336,738.069 379.23783333333336,742.069" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="B" data-to="C" data-label="正常 JSON">
+  <rect x="61.43500000000003" y="454.6690000000001" width="71.70400000000001" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="97.28700000000003" y="469.8190000000001" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">正常 JSON</text>
+</g>
+<g class="edge-label" data-from="B" data-to="D" data-label="空字符串">
+  <rect x="416.82025" y="607.869" width="65.17" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="449.40524999999997" y="623.019" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">空字符串</text>
+</g>
+<g class="edge-label" data-from="B" data-to="E" data-label="键不存在">
+  <rect x="213.37700000000004" y="290.619" width="65.17" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="245.96200000000005" y="305.769" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">键不存在</text>
+</g>
+<g class="edge-label" data-from="F" data-to="G" data-label="存在">
+  <rect x="124.41525000000006" y="591.869" width="41.41" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="145.12025000000006" y="607.019" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">存在</text>
+</g>
+<g class="edge-label" data-from="F" data-to="H" data-label="不存在">
+  <rect x="320.33875" y="607.869" width="53.29" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="346.98375" y="623.019" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">不存在</text>
+</g>
+<g class="node" data-id="A" data-label="查询门店详情" data-shape="rectangle">
+  <rect x="180.94200000000004" y="32" width="130.87" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="246.37700000000004" y="50.45" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">查询门店详情</text>
+</g>
+<g class="node" data-id="B" data-label="Redis 内容？" data-shape="diamond">
+  <polygon points="246.37700000000004,108.9 319.73650000000004,182.2595 246.37700000000004,255.619 173.01750000000004,182.2595" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="246.37700000000004" y="182.2595" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Redis 内容？</text>
+</g>
+<g class="node" data-id="C" data-label="反序列化返回" data-shape="rectangle">
+  <rect x="32.00000000000003" y="519.969" width="130.87" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="97.43500000000003" y="538.4190000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">反序列化返回</text>
+</g>
+<g class="node" data-id="D" data-label="返回不存在" data-shape="rectangle">
+  <rect x="340.5545" y="742.069" width="116.05" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="398.5795" y="760.519" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">返回不存在</text>
+</g>
+<g class="node" data-id="E" data-label="查询 MySQL" data-shape="rectangle">
+  <rect x="186.87000000000003" y="355.919" width="119.014" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="246.37700000000004" y="374.36899999999997" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">查询 MySQL</text>
+</g>
+<g class="node" data-id="F" data-label="门店存在？" data-shape="diamond">
+  <polygon points="246.37700000000004,432.8190000000001 316.40200000000004,502.84400000000005 246.37700000000004,572.869 176.35200000000003,502.84400000000005" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="246.37700000000004" y="502.84400000000005" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">门店存在？</text>
+</g>
+<g class="node" data-id="G" data-label="缓存 JSON，30 分钟" data-shape="rectangle">
+  <rect x="59.973250000000064" y="665.169" width="170.88399999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="145.41525000000004" y="683.619" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">缓存 JSON，30 分钟</text>
+</g>
+<g class="node" data-id="H" data-label="缓存空字符串，2 分钟" data-shape="rectangle">
+  <rect x="254.85725000000002" y="665.169" width="184.96299999999997" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="347.33875" y="683.619" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">缓存空字符串，2 分钟</text>
+</g>
+<g class="node" data-id="I" data-label="返回门店" data-shape="rectangle">
+  <rect x="94.80025000000006" y="742.069" width="101.22999999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="145.41525000000007" y="760.519" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">返回门店</text>
+</g>
+</svg>

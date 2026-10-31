@@ -1,0 +1,11 @@
+sequenceDiagram
+ participant A as 消费者 A
+ participant D as MySQL
+ participant B as 消费者 B
+ participant E as Elasticsearch
+ A->>D: 读取旧数据与版本 V
+ D->>D: 商户更新，版本变为 V+1
+ B->>D: 读取新数据与版本 V+1
+ B->>E: 写入 V+1，成功
+ A->>E: 迟到写入 V
+ E-->>A: 409，保留新数据

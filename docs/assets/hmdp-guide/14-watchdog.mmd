@@ -1,0 +1,12 @@
+sequenceDiagram
+ participant T as 初始化线程
+ participant W as 客户端续期任务
+ participant R as Redis
+ T->>R: lock，持有者计数与租期
+ R-->>T: 获取成功
+ T->>W: 无显式租期，安排续期
+ W->>R: 校验持有者，延长 TTL
+ R-->>W: 续期成功，安排下轮
+ T->>T: 完成库存初始化
+ T->>R: unlock，校验持有者并释放
+ T->>W: 取消对应续期登记

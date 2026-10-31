@@ -1,0 +1,9 @@
+stateDiagram-v2
+ [*] --> INIT
+ INIT --> READY: 预占确认成功
+ INIT --> CANCELLING: 拒绝或处理超时
+ READY --> SUCCEEDED: 事务落单成功
+ READY --> CANCELLING: 超时、业务拒绝或死信裁决
+ CANCELLING --> FAILED: 预占释放确认完成
+ SUCCEEDED --> [*]
+ FAILED --> [*]

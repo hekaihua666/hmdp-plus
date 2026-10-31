@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>黑马点评</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="./css/element.css">
+
+  <link href="./css/shop-detail.css?v=20261011-photos" rel="stylesheet">
+  <link href="./css/main.css" rel="stylesheet">
+
+  <style type="text/css">
+    .seckill-result{margin:14px 0;padding:16px;border:1px solid #ffd7c7;border-radius:12px;background:#fff8f4;line-height:1.7}
+    .seckill-result.is-success{background:#f1faf5;border-color:#c7e8d4}.seckill-result.is-failed{background:#fff4f3;border-color:#f0ceca}
+    .seckill-result h3{margin:0 0 6px;font-size:16px}.seckill-result p{margin:5px 0;font-size:13px;color:#6d7480}
+    .seckill-result .request-id{font-family:Consolas,monospace;overflow-wrap:anywhere;color:#475569}.seckill-result .request-error{color:#c05d36}
+    .seckill-result button{margin-top:8px}.voucher-btn:disabled{opacity:.55;cursor:default}.voucher-btn{border:0;font-family:inherit}
+    .request-history{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.request-history button{border:1px solid #e9ddd7;background:#fff;border-radius:7px;padding:7px 10px;font-size:12px;color:#8a5d49;cursor:pointer}
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+    <div class="header-title"></div>
+    <div class="header-share">...</div>
+  </div>
+  <div class="top-bar"></div>
+  <div class="shop-info-box">
+    <div class="shop-title">{{util.displayText(shop.name)}}</div>
+    <div class="shop-rate">
+      <el-rate
+          disabled :value="shop.score/10"
+          text-color="#F63"
+          show-score
+      ></el-rate>
+      <span>{{shop.comments}}条</span>
+    </div>
+    <div class="shop-rate-info">{{typeName}} · 人均 ¥{{shop.avgPrice}}</div>
+    <div class="demo-notice" v-if="shop.name && shop.name.includes('演示')">示例内容：照片为场景素材，地址、价格与评分用于功能体验，不能用于真实预约。</div>
+    <div class="shop-images">
+      <div v-for="(s,i) in shop.images" :key="i">
+        <img :src="s" alt="店铺场景配图" loading="lazy">
+      </div>
+    </div>
+    <div class="shop-address">
+      <div><i class="el-icon-map-location"></i></div>
+      <span>{{util.displayText(shop.address)}}</span>
+    </div>
+  </div>
+  <div class="shop-divider"></div>
+  <div class="shop-open-time">
+    <span><i class="el-icon-watch"></i></span>
+    <div>营业时间</div>
+    <div>{{shop.openHours}}</div>
+
+  </div>
+  <div class="shop-divider"></div>
+  <div class="shop-voucher">
+    <div>
+      <span class="voucher-icon">券</span>
+      <span style="font-weight: bold;">代金券</span>
+    </div>
+    <p class="muted" v-if="!vouchers.length">暂无可用优惠券</p>
+    <el-button v-if="hasUserToken" size="small" @click="loadRequests">查询本店最近申请</el-button>
+    <div class="request-history"><button v-for="r in requestHistory" :key="r.orderId" @click="openRequest(r)">{{util.displayText(r.voucherTitle) || '抢购申请'}} · {{r.state==='SUCCEEDED' ? '已成功' : r.state==='FAILED' ? '未完成' : '处理中'}}</button></div>
+    <section v-if="requestId" :class="['seckill-result',{'is-success':requestState==='SUCCEEDED','is-failed':requestState==='FAILED'}]" aria-live="polite">
+      <h3>{{requestState==='SUCCEEDED' ? '抢购成功' : requestState==='FAILED' ? '本次抢购未完成' : '抢购申请处理中'}}</h3>
+      <p>{{requestMessage}}</p><p>申请编号 <span class="request-id">{{requestId}}</span></p>
+      <p v-if="requestState==='SUCCEEDED'">暂不支持支付或核销。</p>
+      <p v-else-if="requestState!=='FAILED'">关闭或刷新页面不会取消申请，可稍后重新查询进度。</p>
+      <p class="request-error" v-if="requestError">{{requestError}}</p>
+      <el-button size="small" :loading="queryingRequest" @click="refreshRequest">查询最新进度</el-button>
+    </section>
+    <div class="voucher-box" v-for="v in vouchers" :key="v.id" v-if="!isEnd(v)">
+      <div class="voucher-circle">
+        <div class="voucher-b"></div>
+        <div class="voucher-b"></div>
+        <div class="voucher-b"></div>
+      </div>
+      <div class="voucher-left">
+        <div class="voucher-title">{{util.displayText(v.title)}}</div>
+        <div class="voucher-subtitle">{{util.displayText(v.subTitle)}}</div>
+        <div class="voucher-price"><div>￥ {{util.formatPrice(v.payValue)}}</div>  <span>{{(v.payValue*10)/v.actualValue}}折</span></div>
+      </div>
+      <div class="voucher-right">
+        <div v-if="v.type" class="seckill-box">
+          <button class="voucher-btn" :disabled="isNotBegin(v) || v.stock < 1 || submittingVoucherId===v.id || requestBusy(v)" @click="seckill(v)">{{submittingVoucherId===v.id ? '提交中…' : requestBusy(v) ? '处理中…' : '限时抢购'}}</button>
+          <div class="seckill-stock">剩余 <span>{{v.stock}}</span> 张</div>
+          <div class="seckill-time">{{formatTime(v)}}</div>
+        </div>
+        <button class="voucher-btn" v-else @click="showRules(v)">使用说明</button>
+      </div>
+    </div>
+  </div>
+  <div class="shop-divider"></div>
+  <div class="shop-comments">
+    <div class="comments-head"><div>相关探店笔记 <span>（{{noteTotal}}）</span></div></div>
+    <p class="muted" v-if="!notes.length && !notesLoading && !notesError">还没有人发布这家店铺的笔记。</p>
+    <article class="related-note" v-for="note in notes" :key="note.id" @click="toBlog(note.id)">
+      <img :src="note.images.split(',')[0]" alt="笔记封面" loading="lazy">
+      <div><strong>{{util.displayText(note.title)}}</strong><p>{{util.displayText(note.name)}} · {{note.liked}} 人点赞</p><span>查看笔记 <i class="el-icon-arrow-right"></i></span></div>
+    </article>
+    <p class="muted" v-if="notesLoading">正在加载笔记…</p>
+    <button class="text-link" v-else-if="notesError || notes.length < noteTotal" @click="queryNotes">{{notesError ? '加载失败，点击重试' : '加载更多笔记'}}</button>
+  </div>
+  <div class="shop-divider"></div>
+  <div class="copyright">
+    copyright ©2021 hmdp.com
+  </div>
+</div>
+<script src="./js/vue.js"></script>
+<script src="./js/axios.min.js"></script>
+<!-- 引入组件库 -->
+<script src="./js/element.js"></script>
+<script src="./js/common.js?v=20261012-ui"></script>
+<script>
+
+  const app = new Vue({
+    el: "#app",
+    data: {
+      util,
+      shop: {},
+      vouchers: [], typeName: "", notes: [], noteTotal: 0, notesPage: 1, notesLoading: false, notesError: false, shopId: null,
+      submittingVoucherId:null, requestId:null, requestVoucherId:null, requestState:'INIT', requestMessage:'请求已受理，正在处理',
+      requestError:'', queryingRequest:false, pollTimer:null, pollAttempts:0
+      ,requestHistory:[], hasUserToken:!!token
+    },
+    created() {
+      // 获取参数
+      let shopId = util.getUrlParam("id");
+      this.shopId = shopId; this.queryNotes();
+      // 只保存本页申请ID，查询结果仍由后端按登录身份鉴权；订单ID全程使用字符串。
+      try {const saved=JSON.parse(sessionStorage.getItem('hmdp_seckill_pending') || 'null');
+        if(token && saved && String(saved.shopId)===String(shopId) && /^\d+$/.test(saved.orderId)){
+          this.requestId=saved.orderId;this.requestVoucherId=saved.voucherId;this.queryRequest();
+        }
+      } catch(invalid){sessionStorage.removeItem('hmdp_seckill_pending');}
+      if(token) this.loadRequests();
+      // 查询酒店信息
+      this.queryShopById(shopId);
+      // 查询优惠券信息
+      this.queryVoucher(shopId);
+    },
+    beforeDestroy(){clearTimeout(this.pollTimer);},
+    methods: {
+      loadRequests(){return axios.get('/voucher-order/requests',{params:{shopId:this.shopId}}).then(({data})=>{
+        this.requestHistory=data;
+        if(!this.requestId && data.length) this.openRequest(data[0]);
+      }).catch(()=>this.$message.error('申请记录暂时查询失败，请稍后重试'));},
+      openRequest(row){clearTimeout(this.pollTimer);this.requestId=row.orderId;this.requestVoucherId=row.voucherId;
+        this.requestState=row.state;this.requestMessage=row.message;this.requestError='';this.pollAttempts=0;
+        sessionStorage.setItem('hmdp_seckill_pending',JSON.stringify({shopId:this.shopId,voucherId:row.voucherId,orderId:row.orderId}));this.queryRequest();},
+      requestBusy(v){return this.requestId && this.requestVoucherId===v.id && !['SUCCEEDED','FAILED'].includes(this.requestState);},
+      refreshRequest(){this.pollAttempts=0;clearTimeout(this.pollTimer);this.queryRequest();},
+      queryRequest(){
+        if(!this.requestId || this.queryingRequest) return;
+        const id=this.requestId;this.queryingRequest=true;this.requestError='';clearTimeout(this.pollTimer);
+        axios.get('/voucher-order/requests/'+encodeURIComponent(id)).then(({data})=>{
+          if(id!==this.requestId) return;
+          this.requestState=data.state;this.requestMessage=data.message;
+          if(['SUCCEEDED','FAILED'].includes(data.state)) this.queryVoucher(this.shopId);
+        }).catch(error=>{
+          if(String(error).includes('无权查看')){sessionStorage.removeItem('hmdp_seckill_pending');this.requestId=null;return;}
+          this.requestError='进度暂时查询失败，可以稍后重试；这不代表申请失败。';
+        }).finally(()=>{
+          this.queryingRequest=false;
+          if(this.requestId && !['SUCCEEDED','FAILED'].includes(this.requestState)){
+            if(++this.pollAttempts<60) this.pollTimer=setTimeout(()=>this.queryRequest(),2000);
+            else this.requestError='申请仍在处理中，已暂停自动查询，请稍后点击查询最新进度。';
+          }
+        });
+      },
+      // 只读关联笔记支持游客；点赞和发布依然要求消费者登录。
+      queryNotes() {
+        if (this.notesLoading) return;
+        this.notesLoading = true; this.notesError = false;
+        axios.get('/blog/of/shop', {params: {shopId: this.shopId, current: this.notesPage}})
+          .then(({data, total}) => {this.notes = this.notes.concat(data); this.noteTotal = total; this.notesPage++;})
+          .catch(() => this.notesError = true).finally(() => this.notesLoading = false);
+      },
+      toBlog(id) {location.href = '/blog-detail.html?id=' + id;},
+      showRules(v) {this.$alert((v.rules || '暂无说明') + '。普通券目前仅展示信息，暂未开放购买。', '使用说明', {confirmButtonText: '知道了'});},
+      goBack() {
+        history.back();
+      },
+      queryShopById(shopId) {
+        axios.get("/shop/" + shopId)
+        .then(({data}) => {
+          data.images = data.images.split(",")
+          this.shop = data;
+          axios.get("/shop-type/list").then(({data: types}) => {this.typeName = (types.find(t => t.id === this.shop.typeId) || {}).name || "商户";});
+        })
+        .catch(this.$message.error)
+      },
+      queryVoucher(shopId) {
+        axios.get("/voucher/list/" + shopId)
+        .then(({data}) => {
+          // 后端已限定上架券；旧查询未返回status，不能在前端再次按缺失字段过滤。
+          this.vouchers = (data || []).filter(v => !this.isEnd(v));
+        })
+        .catch(this.$message.error)
+      },
+      formatTime(v){
+        // 开始和结束都显示日期，跨天/跨月的秒杀券不会被误读成今晚结束。
+        const format = date => (date.getMonth()+1)+'月'+date.getDate()+'日 '+date.getHours()+':'+this.formatMinutes(date.getMinutes());
+        return format(new Date(v.beginTime)) + ' ~ ' + format(new Date(v.endTime));
+      },
+      formatMinutes(m){
+        if(m < 10) m = "0" + m
+        return m;
+      },
+      isNotBegin(v){
+        return v.type === 1 && v.beginTime && new Date(v.beginTime).getTime() > Date.now();
+      },
+      isEnd(v){
+        // 普通券没有秒杀起止时间，不能把null当作1970年导致误判过期。
+        return v.type === 1 && v.endTime && new Date(v.endTime).getTime() < Date.now();
+      },
+      seckill(v){
+        if(this.submittingVoucherId!=null || this.requestBusy(v)) return;
+        if(!token){
+          this.$message.error("请先登录")
+          // 未登录，跳转
+          setTimeout(() => {
+            location.href = "/login.html"
+          }, 200);
+          return;
+        }
+        if(this.isNotBegin(v)){
+          this.$message.error("优惠券抢购尚未开始！")
+          return;
+        }
+        if(this.isEnd(v)){
+          this.$message.error("优惠券抢购已经结束！")
+          return;
+        }
+        if(v.stock < 1){
+          this.$message.error("库存不足，请刷新再试试！")
+          return;
+        }
+        let id = v.id;
+        // 提交成功只表示受理；最终结果通过申请查询确认，不能提前显示抢购成功。
+        this.submittingVoucherId=id;
+        // 此接口包含Broker确认，独立设置超时；不放宽全站请求的默认超时。
+        axios.post("/voucher-order/seckill/" + id,{}, {timeout:12000})
+        .then(({data}) => {
+          clearTimeout(this.pollTimer);this.requestId=String(data);this.requestVoucherId=id;
+          this.requestState='INIT';this.requestMessage='请求已受理，正在处理';this.requestError='';this.pollAttempts=0;
+          sessionStorage.setItem('hmdp_seckill_pending',JSON.stringify({shopId:this.shopId,voucherId:id,orderId:this.requestId}));
+          this.$message.info('请求已受理，正在确认抢购结果');this.queryRequest();
+        })
+        .catch(error=>{this.$message.error(error==='服务器异常' ? '提交结果暂未确认，请查询本店最近申请' : error);this.loadRequests();})
+        .finally(()=>this.submittingVoucherId=null)
+      }
+    }
+  })
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+sequenceDiagram
+ participant B as 浏览器
+ participant A as 登录接口
+ participant R as Redis
+ participant M as MySQL
+ B->>A: 提交手机号与验证码
+ A->>R: GET login:code:手机号
+ A->>M: 查询或创建用户
+ A->>R: HSET login:token:随机令牌
+ A-->>B: 返回令牌
+ B->>A: 请求携带 authorization
+ A->>R: 读取会话并刷新有效期
+ A->>A: 写入 UserHolder，执行权限检查
+ A-->>B: 返回业务结果，清理 ThreadLocal

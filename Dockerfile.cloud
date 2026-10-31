@@ -1,0 +1,18 @@
+# HMDP 后端镜像（云服务器版）：多阶段构建。
+# 与根目录 Dockerfile 的唯一区别：Maven 走阿里云镜像，首次拉依赖快得多。
+# 用于 deploy/cloud/start-all.sh（叠加 compose.cloud.yaml）。
+FROM maven:3.9-eclipse-temurin-17 AS build
+WORKDIR /build
+# 用国内镜像源替换 Maven Central，否则云上要下载几百个 jar，很慢。
+COPY maven-settings.xml /root/.m2/settings.xml
+# 先只拷 pom.xml 拉依赖，让"依赖没变"时复用 Docker 层缓存。
+COPY pom.xml .
+RUN mvn -q -B -DskipTests dependency:resolve dependency:resolve-plugins
+COPY src ./src
+RUN cp src/main/resources/application.example.yaml src/main/resources/application.yaml && mvn -q -B -DskipTests package
+
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+COPY --from=build /build/target/hmdp-1.0-SNAPSHOT.jar app.jar
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "app.jar"]

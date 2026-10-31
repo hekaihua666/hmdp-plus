@@ -1,0 +1,11 @@
+sequenceDiagram
+ participant B as 浏览器
+ participant S as FollowService
+ participant M as MySQL
+ B->>S: 确保关注指定作者
+ S->>M: 事务首次读：锁当前用户行
+ S->>M: 查询作者是否存在
+ S->>M: 查询当前关注关系
+ S->>M: 不存在才插入
+ M-->>S: 事务提交，释放行锁
+ S-->>B: 返回目标关注状态

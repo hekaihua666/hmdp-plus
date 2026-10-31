@@ -1,0 +1,58 @@
+# Local development: Docker middleware + Java backend in IDEA.
+# Shares the existing data volumes; use start-local.ps1 to switch from full mode.
+name: hmdp
+services:
+  mysql:
+    extends:
+      file: compose.yaml
+      service: mysql
+  redis:
+    extends:
+      file: compose.yaml
+      service: redis
+  elasticsearch:
+    extends:
+      file: compose.yaml
+      service: elasticsearch
+  volume-init:
+    extends:
+      file: compose.yaml
+      service: volume-init
+  namesrv:
+    extends:
+      file: compose.yaml
+      service: namesrv
+  broker:
+    extends:
+      file: compose.yaml
+      service: broker
+    volumes:
+      - ./local/broker.conf:/home/rocketmq/broker.conf:ro
+  nginx:
+    image: nginx:alpine
+    container_name: hmdp-nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./local/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../src/main/resources/nginx-1.18.0/html:/usr/share/nginx/html:ro
+
+volumes:
+  mysql-data:
+    external: true
+    name: hmdp-infra_mysql-data
+  es-data:
+    external: true
+    name: hmdp-infra_es-data
+  broker-store:
+    external: true
+    name: hmdp-mq_broker-store
+  broker-logs:
+    external: true
+    name: hmdp-mq_broker-logs
+  namesrv-logs:
+    external: true
+    name: hmdp-mq_namesrv-logs

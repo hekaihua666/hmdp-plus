@@ -1,0 +1,26 @@
+# 构建后端镜像时忽略这些目录，避免把几十上百 MB 的构建产物/依赖塞进 build context。
+target
+.idea
+.vscode
+.git
+.github
+*.iml
+*.log
+*.md
+docs
+database
+scripts
+codex-continuity
+ES修复说明.md
+ES审查与修复记录.md
+.env
+.env.*
+!.env.example
+
+# deploy 目录整体不进构建上下文（里面有十几 MB 的 IK 词典，后端镜像用不到）：
+# Nginx / ES / MySQL 的配置由 compose 直接挂载，不需要打进后端镜像。
+deploy
+
+config
+_backups
+src/main/resources/application.yaml

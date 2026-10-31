@@ -1,0 +1,39 @@
+# Shared template; credentials come from environment or local private config.
+server:
+  port: 8081
+spring:
+  application:
+    name: hmdp
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 3307 = Docker 容器里的 MySQL（deploy/infra/compose.yaml）。
+    # native MySQL80 仍占用 3306，服务其他学习项目，互不干扰。
+    # 连接信息统一走环境变量：换机器只改环境变量，不改代码。
+    url: "${DB_URL:jdbc:mysql://127.0.0.1:3307/hmdp?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}"
+    username: "${DB_USERNAME:root}"
+    # 密码不设默认值，必须由环境变量 DB_PASSWORD 提供，避免密钥写进代码/仓库。
+    password: "${DB_PASSWORD}"
+  redis:
+    # 使用本机 Redis；教程中的局域网地址只对作者自己的电脑有效
+    host: "${REDIS_HOST:127.0.0.1}"
+    port: "${REDIS_PORT:6379}"
+    lettuce:
+      pool:
+        # 连接池上限。压测前这里是 10，高并发下大量请求线程会阻塞在"借连接"上，
+        # 表现出来就是"并发翻倍、吞吐不涨、延迟线性膨胀"。默认放宽到 200，可用环境变量覆盖。
+        max-active: "${REDIS_POOL_MAX_ACTIVE:200}"
+        max-idle: "${REDIS_POOL_MAX_IDLE:50}"
+        min-idle: 1
+        time-between-eviction-runs: 10s
+  jackson:
+    default-property-inclusion: non_null # JSON处理时忽略非空字段
+elasticsearch:
+  host: "${ES_HOST:127.0.0.1}"
+  port: "${ES_PORT:9200}"
+mybatis-plus:
+  type-aliases-package: com.hmdp.entity # 别名扫描包
+logging:
+  level:
+    # 日志级别走环境变量，方便做"DEBUG 与 INFO"的压测对照。
+    # 生产必须 info：debug 下每个请求都要同步写日志文件，直接拖垮吞吐。
+    com.hmdp: "${APP_LOG_LEVEL:info}"

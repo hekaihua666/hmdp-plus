@@ -1,0 +1,18 @@
+sequenceDiagram
+ participant B as 商户后台
+ participant M as MySQL
+ participant R as Redis
+ participant T as 发送任务
+ participant Q as RocketMQ
+ participant E as Elasticsearch
+ participant C as 同步消费者
+ B->>M: 同事务更新门店与 Outbox revision
+ M-->>B: 提交成功
+ B->>R: 提交后删除详情缓存
+ T->>M: 按 revision 领取待发送记录
+ T->>Q: 同步发送 shopId 与发送版本
+ T->>M: 按 revision 确认为 SENT
+ Q->>C: 投递门店同步通知
+ C->>M: 单条联表查询读取数据与数据版本
+ C->>E: external_gte 覆盖写
+ E-->>C: 成功或旧版本 409

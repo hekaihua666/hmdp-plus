@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>黑马点评</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="./css/element.css">
+  <link href="./css/main.css" rel="stylesheet">
+  <link href="./css/blog-edit.css" rel="stylesheet">
+
+  <style type="text/css">
+
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-cancel-btn" @click="goBack">取消</div>
+    <div class="header-title">&nbsp;&nbsp;发笔记<i class="el-icon-info"></i></div>
+    <div class="header-commit">
+      <button class="header-commit-btn" :disabled="submitting || uploading" @click="submitBlog">{{submitting ? '发布中…' : uploading ? '上传中…' : '发布'}}</button>
+    </div>
+  </div>
+  <div class="upload-box">
+    <input type="file" accept="image/jpeg,image/png,image/webp" @change="fileSelected" name="file" ref="fileInput" style="display: none">
+    <div class="upload-btn" @click="openFileDialog">
+      <i class="el-icon-camera"></i>
+      <div style="font-size: 12px;line-height: 12px">上传照片</div>
+    </div>
+    <div class="pic-list">
+      <div class="pic-box" v-for="(f,i) in fileList" :key="i">
+        <img :src="f" alt="">
+        <i class="el-icon-close" @click="deletePic(i)"></i>
+      </div>
+    </div>
+  </div>
+  <div class="blog-title">
+    <input v-model="params.title" maxlength="255" type="text" placeholder="为这次探店起个标题">
+  </div>
+  <div class="blog-content">
+    <textarea v-model="params.content" maxlength="2048" placeholder="写下你的探店体验（最多2048字）"></textarea>
+  </div>
+  <div class="divider"></div>
+  <div class="blog-shop" @click="showDialog=true">
+    <div class="shop-left">关联商户</div>
+    <div v-if="selectedShop.name">{{selectedShop.name}}</div>
+    <div v-else>去选择&nbsp;<i class="el-icon-arrow-right"></i></div>
+  </div>
+  <div class="mask" v-show="showDialog" @click="showDialog=false"></div>
+
+  <transition name="el-zoom-in-bottom">
+    <div class="shop-dialog" v-show="showDialog">
+      <div class="blog-shop">
+        <div class="shop-left">关联商户</div>
+      </div>
+      <div class="search-bar">
+        <div class="city-select">杭州 <i class="el-icon-arrow-down"></i></div>
+        <div class="search-input">
+          <i class="el-icon-search" @click="queryShops"></i>
+          <input v-model="shopName" @keyup.enter="queryShops" type="text" placeholder="搜索商户名称">
+        </div>
+      </div>
+      <div class="shop-list">
+        <div v-for="s in shops" class="shop-item" @click="selectShop(s)">
+          <div class="shop-name">{{s.name}}</div>
+          <div>{{s.area}}</div>
+        </div>
+      </div>
+    </div>
+  </transition>
+</div>
+<script src="./js/vue.js"></script>
+<script src="./js/axios.min.js"></script>
+<!-- 引入组件库 -->
+<script src="./js/element.js"></script>
+<script src="./js/common.js"></script>
+<script src="./js/footer.js"></script>
+<script>
+
+  const app = new Vue({
+    el: "#app",
+    data() {
+      return {
+        util,
+        fileList: [], // 文件列表
+        params: {},
+        showDialog: false, //
+        shops: [], // 商户信息
+        shopName: "", //商户名称
+        selectedShop: {}, // 选中的商户
+        submitting:false, uploading:false,
+      }
+    },
+    created() {
+      this.checkLogin();
+      this.queryShops();
+    },
+    methods: {
+      queryShops() {
+        axios.get("/shop/of/name", {params:{name:this.shopName}})
+          .then(({data}) => this.shops = data)
+          .catch(this.$message.error)
+      },
+      selectShop(s) {
+        this.selectedShop = s;
+        this.showDialog = false;
+      },
+      submitBlog() {
+        // uploading防止照片地址还没返回就提交；submitting防止一次点击期间重复POST。
+        // 这些仅是页面交互保护，必填和作者归属还要由后端再次校验。
+        if(this.submitting || this.uploading)return;
+        if(!this.params.title || !this.params.title.trim() || !this.params.content || !this.params.content.trim()
+          || !this.fileList.length || !this.selectedShop.id){
+          this.$message.error('请填写标题、正文，上传照片并选择关联门店');return;
+        }
+        this.submitting=true;
+        let {...data} = this.params;
+        // 沿用原接口：images为地址串、shopId为选中门店。userId、liked等由服务端决定。
+        data.images = this.fileList.join(",");
+        data.shopId = this.selectedShop.id;
+        axios.post("/blog", data)
+          // 同步发布成功返回笔记ID，直接进入刚创建的详情；不要与MQ抢购的“受理ID”混淆。
+          .then(({data}) => location.href = "/blog-detail.html?id="+data)
+          .catch(this.$message.error).finally(()=>this.submitting=false)
+      },
+      openFileDialog() {
+        this.$refs.fileInput.click();
+      },
+      fileSelected() {
+        // accept属性和这里的MIME判断用于浏览器体验，不等同于服务端校验了真实文件格式。
+        let file = this.$refs.fileInput.files[0];
+        if(!file || this.uploading)return;
+        if(this.fileList.length>=9){this.$message.error('最多上传9张照片');return;}
+        if(!['image/jpeg','image/png','image/webp'].includes(file.type)){this.$message.error('请选择JPG、PNG或WebP照片');return;}
+        this.uploading=true;
+        let formData = new FormData();
+        formData.append("file", file);
+        // FormData的boundary由浏览器生成，不能手写一个与请求体不一致的值。
+        axios
+          .post("/upload/blog", formData)
+          // 上传接口返回/blogs/...，Nginx通过/imgs/blogs/...提供这张本地图片。
+          .then(({data}) => this.fileList.push('/imgs' + data))
+          .catch(this.$message.error).finally(()=>{this.uploading=false;this.$refs.fileInput.value='';});
+      },
+      deletePic(i) {
+        // 仅从草稿移除；不开放按公开图片路径删除服务器文件的接口。
+        this.fileList.splice(i, 1);
+      },
+      checkLogin() {
+        // 获取token
+        let token = sessionStorage.getItem("token");
+        if (!token) {
+          location.href = "login.html"
+        }
+        // 查询用户信息
+        axios.get("/user/me")
+          .then()
+          .catch(err => {
+            this.$message.error(err);
+            setTimeout(() => location.href = "login.html", 200)
+          })
+      },
+      goBack() {
+        history.back();
+      },
+      handleRemove(file) {
+        console.log(file);
+      }
+    },
+
+  })
+</script>
+</body>
+</html>
