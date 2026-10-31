@@ -13,7 +13,7 @@ public class SystemConstants {
     /** 先看环境变量有没有指定图片目录，没有就用项目目录，保证两种运行方式都不改原逻辑。 */
     private static String resolveUploadDir() {
         String configured = System.getenv("IMAGES_DIR");
-        if (configured != null && !configured.isBlank()) {
+        if (configured != null && !configured.trim().isEmpty()) {
             return configured;
         }
         return Paths.get(
